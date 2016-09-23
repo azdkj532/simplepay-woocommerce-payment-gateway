@@ -219,7 +219,6 @@ function tbz_wc_simplepay_init() {
 	    **/
 		function receipt_page( $order ) {
 			echo '<p>Thank you - your order is now pending payment. You will be automatically redirected to the gateway to make payment.</p>';
-			echo $this->generate_simplepay_form( $order );
 		}
 
 		/**
@@ -425,63 +424,28 @@ function tbz_wc_simplepay_init() {
 
 
 	/**
-	 * only add the naira currency and symbol if WC versions is less than 2.1
-	 */
-	if ( version_compare( WOOCOMMERCE_VERSION, "2.1" ) <= 0 ) {
-
-		/**
-		* Add NGN as a currency in WC
-		**/
-		add_filter( 'woocommerce_currencies', 'tbz_add_my_currency' );
-
-		if( ! function_exists( 'tbz_add_my_currency' )){
-			function tbz_add_my_currency( $currencies ) {
-			     $currencies['NGN'] = __( 'Naira', 'woocommerce' );
-			     return $currencies;
-			}
-		}
-
-		/**
-		* Enable the naira currency symbol in WC
-		**/
-		add_filter('woocommerce_currency_symbol', 'tbz_add_my_currency_symbol', 10, 2);
-
-		if( ! function_exists( 'tbz_add_my_currency_symbol' ) ){
-			function tbz_add_my_currency_symbol( $currency_symbol, $currency ) {
-			     switch( $currency ) {
-			          case 'NGN': $currency_symbol = '&#8358; '; break;
-			     }
-			     return $currency_symbol;
-			}
-		}
-	}
-
-
-	/**
 	* Add Settings link to the plugin entry in the plugins menu for WC 2.1 and above
 	**/
-	else{
-		add_filter('plugin_action_links', 'tbz_simplepay_plugin_action_links', 10, 2);
+	add_filter('plugin_action_links', 'plugin_action_links', 10, 2);
 
-		function tbz_simplepay_plugin_action_links($links, $file) {
-		    static $this_plugin;
+	function plugin_action_links($links, $file) {
+		static $this_plugin;
 
-		    if (!$this_plugin) {
-		        $this_plugin = plugin_basename(__FILE__);
-		    }
-
-		    if ($file == $this_plugin) {
-		        $settings_link = '<a href="' . get_bloginfo('wpurl') . '/wp-admin/admin.php?page=wc-settings&tab=checkout&section=wc_tbz_simplepay_gateway">Settings</a>';
-		        array_unshift($links, $settings_link);
-		    }
-		    return $links;
+		if (!$this_plugin) {
+			$this_plugin = plugin_basename(__FILE__);
 		}
+
+		if ($file == $this_plugin) {
+			$settings_link = '<a href="' . get_bloginfo('wpurl') . '/wp-admin/admin.php?page=wc-settings&tab=checkout&section=wc_tbz_simplepay_gateway">Settings</a>';
+			array_unshift($links, $settings_link);
+		}
+		return $links;
 	}
 
 	/**
  	* Display the testmode notice
  	**/
-	function tbz_wc_simplepay_testmode_notice(){
+	function wc_testmode_notice(){
 		$tbz_simplepay_settings = get_option( 'woocommerce_tbz_simplepay_gateway_settings' );
 
 		$simplepay_test_mode = $tbz_simplepay_settings['testmode'];
@@ -494,5 +458,5 @@ function tbz_wc_simplepay_init() {
 	    <?php
 		}
 	}
-	add_action( 'admin_notices', 'tbz_wc_simplepay_testmode_notice' );
+	add_action( 'admin_notices', 'wc_testmode_notice' );
 }
