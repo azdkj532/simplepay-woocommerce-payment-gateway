@@ -113,7 +113,7 @@ function tbz_wc_simplepay_init() {
 		/**
 		 * Get SimplePay Args for passing to SimplePay
 		**/
-		function get_simplepay_args( $order ) {
+		function get_jdway_args( $order ) {
 
 			$order_id 		= $order->id;
 			$order_total	= $order->get_total();
@@ -197,20 +197,27 @@ function tbz_wc_simplepay_init() {
 				</form>';
 		}
 
+        function get_redirect_url( $order_id, $sandbox = false ) {
+			$order 			= wc_get_order( $order_id );
+
+			$jdway_args = $this->get_jdway_args( $order );
+			$payment_args = http_build_query( $jdway_args, '', '&' );
+
+            if ($sandbox) {
+                echo $this->testurl . $payment_args;
+                return $this->testurl . $payment_args;
+            } else {
+                return $this->liveurl . $payment_args;
+            }
+        }
+
 	    /**
 	     * Process the payment and return the result
 	    **/
 		function process_payment( $order_id ) {
-
-			$order 			= wc_get_order( $order_id );
-
-			$simplepay_args = $this->get_simplepay_args( $order );
-
-			$simplepay_args = http_build_query( $simplepay_args, '', '&' );
-
 			return array(
 	        	'result' => 'success',
-				'redirect'	=> $order->get_checkout_payment_url( true )
+				'redirect'	=> get_redirect_url( $order_id ),
 	        );
 		}
 
