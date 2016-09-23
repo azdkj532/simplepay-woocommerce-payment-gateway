@@ -74,10 +74,6 @@ function tbz_wc_simplepay_init() {
             echo '<table class="form-table">';
             $this->generate_settings_html();
             echo '</table>';
-			else{	 ?>
-			<div class="inline error"><p><strong>SimplePay Payment Gateway Disabled</strong>: <?php echo $this->msg ?></p></div>
-
-			<?php }
         }
 
 	    /**
