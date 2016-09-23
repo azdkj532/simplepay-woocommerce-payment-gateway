@@ -197,6 +197,9 @@ function tbz_wc_simplepay_init() {
 				</form>';
 		}
 
+        /*
+         * Generate payment request url
+         */
         function get_redirect_url( $order_id, $sandbox = false ) {
 			$order 			= wc_get_order( $order_id );
 
@@ -217,7 +220,7 @@ function tbz_wc_simplepay_init() {
 		function process_payment( $order_id ) {
 			return array(
 	        	'result' => 'success',
-				'redirect'	=> get_redirect_url( $order_id ),
+				'redirect'	=> $this->get_redirect_url( $order_id ),
 	        );
 		}
 
