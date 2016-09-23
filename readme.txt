@@ -1,4 +1,4 @@
-=== SimplePay WooCommerce Payment Gateway ===
+=== Jdway WooCommerce Payment Gateway ===
 Contributors: tubiz
 Donate link: http://bosun.me/donate
 Tags: woocommerce, payment gateway, payment gateways, mastercard, visa cards, mastercards, interswitch, verve cards, tubiz plugins, verve, nigeria, simplepay

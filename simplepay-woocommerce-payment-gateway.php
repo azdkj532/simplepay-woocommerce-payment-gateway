@@ -1,6 +1,6 @@
 <?php
 /*
-	Plugin Name: SimplePay WooCommerce Payment Gateway
+	Plugin Name: Jdways WooCommerce Payment Gateway
 	Plugin URI: http://bosun.me/simplepay-woocommerce-payment-gateway
 	Description: Simplepay Woocommerce Payment Gateway allows you to accept local and International payment via Verve Card, MasterCard, Visa Card & eTranzact.
 	Version: 1.2.0
@@ -27,8 +27,8 @@ function tbz_wc_simplepay_init() {
 
 		public function __construct(){
 
-			$this->id 					= 'tbz_simplepay_gateway';
-    		$this->icon 				= apply_filters('woocommerce_simplepay_icon', plugins_url( 'assets/simplepay-icon.png' , __FILE__ ) );
+			$this->id 					= 'jdway_gateway';
+    		$this->icon 				= '';
 			$this->has_fields 			= false;
 			$this->order_button_text    = 'Make Payment';
         	$this->testurl 				= 'http://sandbox.simplepay4u.com/process.php';
@@ -45,8 +45,6 @@ function tbz_wc_simplepay_init() {
 			$this->description 				= $this->get_option( 'description' );
 			$this->merchant_email			= $this->get_option( 'merchant_email' );
 			$this->logo_url					= $this->get_option( 'logo_url' );
-			$this->simplepay_fee			= $this->get_option( 'simplepay_fee' );
-			$this->gateway_fee				= $this->get_option( 'gateway_fee' );
 			$this->testmode					= $this->get_option( 'testmode' );
 
 			//Actions
@@ -66,12 +64,6 @@ function tbz_wc_simplepay_init() {
 	 	* Check if the store curreny is set to NGN
 	 	**/
 		public function is_valid_for_use(){
-
-			if( ! in_array( get_woocommerce_currency(), array('NGN') ) ){
-				$this->msg = 'SimplePay doesn\'t support your store currency, set it to Nigerian Naira &#8358; <a href="' . get_bloginfo('wpurl') . '/wp-admin/admin.php?page=wc-settings&tab=general">here</a>';
-				return false;
-			}
-
 			return true;
 		}
 
@@ -136,28 +128,6 @@ function tbz_wc_simplepay_init() {
 					'default' 		=> '',
 	    			'desc_tip'      => false
 				),
-				'simplepay_fee' 	=> array(
-					'title'       => 'Who Bear SimplePay Fee',
-					'type'        => 'select',
-					'description' => 'Select Who Bear the Cost of SimplePay Fee',
-					'default'     => 'customer',
-					'desc_tip'    => true,
-					'options'     => array(
-						'customer' => 'Customer',
-						'merchant' => 'Merchant'
-					)
-				),
-				'gateway_fee' => array(
-					'title'       => 'Who Bear the Gateway Fee',
-					'type'        => 'select',
-					'description' => 'Select Who Bear the Gateway Fee',
-					'default'     => 'customer',
-					'desc_tip'    => true,
-					'options'     => array(
-						'customer'  => 'Customer',
-						'merchant' 	=> 'Merchant'
-					)
-				),
 				'testing' => array(
 					'title'       	=> 'Gateway Testing',
 					'type'        	=> 'title',
@@ -190,20 +160,6 @@ function tbz_wc_simplepay_init() {
 
 			$logo_url		= $this->logo_url;
 
-			if ( 'customer' == $this->simplepay_fee ) {
-				$simplepay_fee = 'N';
-			}
-			else{
-				$simplepay_fee = 'Y';
-			}
-
-			if ( 'customer' == $this->gateway_fee ) {
-				$gateway_fee = 'Y';
-			}
-			else{
-				$gateway_fee = 'N';
-			}
-
 			$merchant_email = $this->merchant_email;
 
 			// SimplePay Args
@@ -216,9 +172,7 @@ function tbz_wc_simplepay_init() {
 				'price' 			=> $order_total,
 				'action' 			=> 'payment',
 				'comments' 			=> $memo,
-				'freeclient' 		=> $simplepay_fee,
 				'nocards'			=> 'N',
-				'chargeforcard' 	=> $gateway_fee,
 				'customid' 			=> $order_id,
 				'site_logo' 		=> $logo_url,
 			);
