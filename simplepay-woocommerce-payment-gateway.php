@@ -218,9 +218,10 @@ function tbz_wc_simplepay_init() {
 	     * Process the payment and return the result
 	    **/
 		function process_payment( $order_id ) {
+            $sandbox = 'yes' === $this->testmode;
 			return array(
 	        	'result' => 'success',
-				'redirect'	=> $this->get_redirect_url( $order_id ),
+				'redirect'	=> $this->get_redirect_url( $order_id, $sandbox ),
 	        );
 		}
 
