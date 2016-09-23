@@ -208,9 +208,9 @@ function tbz_wc_simplepay_init() {
 
             if ($sandbox) {
                 echo $this->testurl . $payment_args;
-                return $this->testurl . $payment_args;
+                return $this->testurl .'?'. $payment_args;
             } else {
-                return $this->liveurl . $payment_args;
+                return $this->liveurl .'?'. $payment_args;
             }
         }
 
