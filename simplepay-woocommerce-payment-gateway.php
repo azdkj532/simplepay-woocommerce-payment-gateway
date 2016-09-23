@@ -31,8 +31,8 @@ function tbz_wc_simplepay_init() {
     		$this->icon 				= '';
 			$this->has_fields 			= false;
 			$this->order_button_text    = 'Make Payment';
-        	$this->testurl 				= 'http://sandbox.simplepay4u.com/process.php';
-			$this->liveurl 				= 'https://simplepay4u.com/process.php';
+        	$this->testurl 				= 'http://60.199.176.121/Payment/Choice.asp';
+            $this->liveurl 				= 'http://www.gamecard.com.tw/Payment/Choice.asp';
 			$this->notify_url        	= WC()->api_request_url( 'WC_Tbz_SimplePay_Gateway' );
         	$this->method_title     	= 'SimplePay';
         	$this->method_description  	= 'Payment Methods Accepted: MasterCard, VisaCard, Verve Card & eTranzact';
@@ -46,6 +46,10 @@ function tbz_wc_simplepay_init() {
 			$this->merchant_email			= $this->get_option( 'merchant_email' );
 			$this->logo_url					= $this->get_option( 'logo_url' );
 			$this->testmode					= $this->get_option( 'testmode' );
+
+            // Jdway information
+			$this->service_code				= $this->get_option( 'service_code' );
+			$this->sign_key					= $this->get_option( 'sign_key' );
 
 			//Actions
 			add_action('woocommerce_receipt_tbz_simplepay_gateway', array($this, 'receipt_page'));
@@ -146,27 +150,22 @@ function tbz_wc_simplepay_init() {
 
 			$memo        	= "Payment for Order ID: $order_id on ". get_bloginfo('name');
 
-			$logo_url		= $this->logo_url;
+			$sign_code		= md5($order_id . $this->sign_key);
 
-			$merchant_email = $this->merchant_email;
-
-			// SimplePay Args
-			$simplepay_args = array(
-				'member' 			=> $merchant_email,
-				'escrow'			=> 'N',
-				'unotify' 			=> $notify_url,
-				'ureturn' 			=> $return_url,
-				'ucancel' 			=> $cancel_url,
-				'price' 			=> $order_total,
-				'action' 			=> 'payment',
-				'comments' 			=> $memo,
-				'nocards'			=> 'N',
-				'customid' 			=> $order_id,
-				'site_logo' 		=> $logo_url,
+			// Jdway Args
+			$payment_args = array(
+				'ServiceCode' 	=> $this->service_code,
+				'OrderID'		=> $order_id,
+				'ReturnURL'		=> $return_url,
+				'UserID'		=> 'userid',
+				'Memo'			=> $memo,
+				'Product'		=> '',
+				'SignCode'		=> $sign_code,
+				'DPage'			=> 'F',
 			);
 
-			$simplepay_args = apply_filters( 'woocommerce_simplepay_args', $simplepay_args );
-			return $simplepay_args;
+			$jdway_args = apply_filters( 'woocommerce_simplepay_args', $payment_args );
+			return $jdway_args;
 		}
 
 	    /**
@@ -486,27 +485,6 @@ function tbz_wc_simplepay_init() {
 	}
 
 
-	/**
-	* Add Settings link to the plugin entry in the plugins menu for WC below 2.1
-	**/
-	if ( version_compare( WOOCOMMERCE_VERSION, "2.1" ) <= 0 ) {
-
-		add_filter('plugin_action_links', 'tbz_simplepay_plugin_action_links', 10, 2);
-
-		function tbz_simplepay_plugin_action_links($links, $file) {
-		    static $this_plugin;
-
-		    if (!$this_plugin) {
-		        $this_plugin = plugin_basename(__FILE__);
-		    }
-
-		    if ($file == $this_plugin) {
-	        $settings_link = '<a href="' . get_bloginfo('wpurl') . '/wp-admin/admin.php?page=woocommerce_settings&tab=payment_gateways&section=WC_Tbz_SimplePay_Gateway">Settings</a>';
-		        array_unshift($links, $settings_link);
-		    }
-		    return $links;
-		}
-	}
 	/**
 	* Add Settings link to the plugin entry in the plugins menu for WC 2.1 and above
 	**/
