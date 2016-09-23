@@ -33,9 +33,8 @@ function tbz_wc_simplepay_init() {
 			$this->order_button_text    = 'Make Payment';
         	$this->testurl 				= 'http://60.199.176.121/Payment/Choice.asp';
             $this->liveurl 				= 'http://www.gamecard.com.tw/Payment/Choice.asp';
-			$this->notify_url        	= WC()->api_request_url( 'WC_Tbz_SimplePay_Gateway' );
-        	$this->method_title     	= 'SimplePay';
-        	$this->method_description  	= 'Payment Methods Accepted: MasterCard, VisaCard, Verve Card & eTranzact';
+        	$this->method_title     	= 'Jdway';
+        	$this->method_description  	= 'Pay by Jdway';
 
 			$this->init_form_fields();
 			$this->init_settings();
@@ -43,8 +42,6 @@ function tbz_wc_simplepay_init() {
 			// Define user set variables
 			$this->title 					= $this->get_option( 'title' );
 			$this->description 				= $this->get_option( 'description' );
-			$this->merchant_email			= $this->get_option( 'merchant_email' );
-			$this->logo_url					= $this->get_option( 'logo_url' );
 			$this->testmode					= $this->get_option( 'testmode' );
 
             // Jdway information
@@ -52,7 +49,7 @@ function tbz_wc_simplepay_init() {
 			$this->sign_key					= $this->get_option( 'sign_key' );
 
 			//Actions
-			add_action('woocommerce_receipt_tbz_simplepay_gateway', array($this, 'receipt_page'));
+			add_action( 'woocommerce_receipt_tbz_simplepay_gateway', array($this, 'receipt_page'));
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 
 			// Payment listener/API hook
@@ -65,12 +62,8 @@ function tbz_wc_simplepay_init() {
          * Admin Panel Options
          **/
         public function admin_options(){
-            echo '<h3>SimplePay</h3>';
-            echo '<p>Simplepay Woocommerce Payment Gateway allows you to accept local and International payment on your Woocommerce store via Verve Card, MasterCard, Visa Card and eTranzact.</p>';
+            echo '<h3>Jdways Payment settings</h3>';
             echo '<p>To open a SimplePay merchant account click <a href="https://simplepay4u.com" target="_blank">here</a>';
-
-
-
             echo '<table class="form-table">';
             $this->generate_settings_html();
             echo '</table>';
@@ -82,12 +75,12 @@ function tbz_wc_simplepay_init() {
 		function init_form_fields(){
 			$this->form_fields = array(
 				'enabled' => array(
-					'title' 			=> 'Enable/Disable',
-					'type' 				=> 'checkbox',
-					'label' 			=> 'Enable SimplePay Payment Gateway',
-					'description' 		=> 'Enable or disable the gateway.',
-            		'desc_tip'      	=> true,
-					'default' 			=> 'yes'
+					'title' 		=> 'Enable/Disable',
+					'type' 			=> 'checkbox',
+					'label' 		=> 'Enable SimplePay Payment Gateway',
+					'description' 	=> 'Enable or disable the gateway.',
+            		'desc_tip'      => true,
+					'default' 		=> 'yes'
 				),
 				'title' => array(
 					'title' 		=> 'Title',
@@ -102,31 +95,17 @@ function tbz_wc_simplepay_init() {
 					'description' 	=> 'This controls the description which the user sees during checkout.',
 					'default' 		=> 'Payment Methods Accepted: MasterCard, VisaCard, Verve Card & eTranzact'
 				),
-				'merchant_email' => array(
-					'title' 		=> 'SimplePay Merchant Email',
-					'type' 			=> 'email',
-					'description' 	=> 'Enter your SimplePay Merchant Account Email Address' ,
-					'default' 		=> '',
-	    			'desc_tip'      => false
-				),
-				'logo_url' 		=> array(
-					'title' 		=> 'Logo URL',
-					'type' 			=> 'text',
-					'description' 	=> 'Enter your Store/Site Logo URL here, this will be shown on the SimplePay payment page' ,
-					'default' 		=> '',
-	    			'desc_tip'      => false
-				),
 				'testing' => array(
 					'title'       	=> 'Gateway Testing',
 					'type'        	=> 'title',
 					'description' 	=> '',
 				),
 				'testmode' => array(
-					'title'       		=> 'Test Mode',
-					'type'        		=> 'checkbox',
-					'label'       		=> 'Enable Test Mode',
-					'default'     		=> 'no',
-					'description' 		=> 'Test mode enables you to test payments before going live. <br />If you ready to start receving payment on your site, kindly uncheck this.',
+					'title'       	=> 'Test Mode',
+					'type'        	=> 'checkbox',
+					'label'       	=> 'Enable Test Mode',
+					'default'     	=> 'no',
+					'description' 	=> 'Test mode enables you to test payments before going live. <br />If you ready to start receving payment on your site, kindly uncheck this.',
 				)
 			);
 		}
@@ -137,15 +116,12 @@ function tbz_wc_simplepay_init() {
 		function get_simplepay_args( $order ) {
 
 			$order_id 		= $order->id;
-
 			$order_total	= $order->get_total();
 
-            $notify_url 	= $this->notify_url;
             $return_url     = esc_url( $this->get_return_url( $order ) );
             $cancel_url 	= esc_url( $order->get_cancel_order_url() );
 
-			$memo        	= "Payment for Order ID: $order_id on ". get_bloginfo('name');
-
+			$memo			= '';
 			$sign_code		= md5($order_id . $this->sign_key);
 
 			// Jdway Args
