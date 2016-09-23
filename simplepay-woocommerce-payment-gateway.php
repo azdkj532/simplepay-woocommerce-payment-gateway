@@ -27,7 +27,7 @@ function tbz_wc_simplepay_init() {
 
 		public function __construct(){
 
-			$this->id 					= 'jdway_gateway';
+			$this->id 					= 'tbz_simplepay_gateway';
     		$this->icon 				= '';
 			$this->has_fields 			= false;
 			$this->order_button_text    = 'Make Payment';
@@ -55,16 +55,6 @@ function tbz_wc_simplepay_init() {
 			add_action( 'woocommerce_api_wc_tbz_simplepay_gateway', array( $this, 'check_simplepay_response' ) );
 
 			// Check if the gateway can be used
-			if ( ! $this->is_valid_for_use() ) {
-				$this->enabled = false;
-			}
-		}
-
-		/**
-	 	* Check if the store curreny is set to NGN
-	 	**/
-		public function is_valid_for_use(){
-			return true;
 		}
 
         /**
@@ -76,12 +66,10 @@ function tbz_wc_simplepay_init() {
             echo '<p>To open a SimplePay merchant account click <a href="https://simplepay4u.com" target="_blank">here</a>';
 
 
-			if ( $this->is_valid_for_use() ){
 
-	            echo '<table class="form-table">';
-	            $this->generate_settings_html();
-	            echo '</table>';
-            }
+            echo '<table class="form-table">';
+            $this->generate_settings_html();
+            echo '</table>';
 			else{	 ?>
 			<div class="inline error"><p><strong>SimplePay Payment Gateway Disabled</strong>: <?php echo $this->msg ?></p></div>
 
