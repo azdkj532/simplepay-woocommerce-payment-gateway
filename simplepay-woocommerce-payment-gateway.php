@@ -140,63 +140,6 @@ function tbz_wc_simplepay_init() {
 			return $jdway_args;
 		}
 
-	    /**
-		 * Generate the SimplePay Payment button link
-	    **/
-	    function generate_simplepay_form( $order_id ) {
-
-			$order 	= wc_get_order( $order_id );
-
-			if ( 'yes' == $this->testmode ) {
-        		$simplepay_adr = $this->testurl;
-			} else {
-				$simplepay_adr = $this->liveurl;
-			}
-
-			$simplepay_args = $this->get_simplepay_args( $order );
-
-			$simplepay_args_array = array();
-
-			foreach ($simplepay_args as $key => $value) {
-				$simplepay_args_array[] = '<input type="hidden" name="'.esc_attr( $key ).'" value="'.esc_attr( $value ).'" />';
-			}
-
-			wc_enqueue_js( '
-				$.blockUI({
-						message: "' . esc_js( __( 'Thank you for your order. We are now redirecting you to the gateway to make payment.', 'woocommerce' ) ) . '",
-						baseZ: 99999,
-						overlayCSS:
-						{
-							background: "#fff",
-							opacity: 0.6
-						},
-						css: {
-							padding:        "20px",
-							zindex:         "9999999",
-							textAlign:      "center",
-							color:          "#555",
-							border:         "3px solid #aaa",
-							backgroundColor:"#fff",
-							cursor:         "wait",
-							lineHeight:		"24px",
-						}
-					});
-				jQuery("#submit_simplepay_payment_form").click();
-			' );
-
-			return '<form action="' . esc_url( $simplepay_adr ) . '" method="post" id="simplepay_payment_form" target="_top">
-					' . implode( '', $simplepay_args_array ) . '
-					<!-- Button Fallback -->
-					<div class="payment_buttons">
-						<input type="submit" class="button alt" id="submit_simplepay_payment_form" value="Make Payment" />
-						<a class="button cancel" href="' . esc_url( $order->get_cancel_order_url() ) . '">Cancel order &amp; restore cart</a>
-					</div>
-					<script type="text/javascript">
-						jQuery(".payment_buttons").hide();
-					</script>
-				</form>';
-		}
-
         /*
          * Generate payment request url
          */
