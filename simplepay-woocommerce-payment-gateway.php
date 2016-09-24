@@ -400,9 +400,9 @@ function tbz_wc_simplepay_init() {
  	* Display the testmode notice
  	**/
 	function wc_testmode_notice(){
-		$tbz_simplepay_settings = get_option( 'woocommerce_jcard_gateway_simplepay_gateway_settings' );
+		$settings = get_option( 'woocommerce_jcard_gateway_settings' );
 
-		$simplepay_test_mode = $tbz_simplepay_settings['testmode'];
+		$_test_mode = $settings['testmode'];
 
 		if ( 'yes' == $simplepay_test_mode ) {
 	    ?>
