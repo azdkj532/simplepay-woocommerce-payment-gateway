@@ -128,7 +128,7 @@ function tbz_wc_simplepay_init() {
 			$payment_args = array(
 				'ServiceCode' 	=> $this->service_code,
 				'OrderID'		=> $order_id,
-				'ReturnURL'		=> $return_url,
+				'ReturnURL'		=> esc_url_raw($return_url),
 				'UserID'		=> 'userid',
 				'Memo'			=> $memo,
 				'Product'		=> '',
