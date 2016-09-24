@@ -23,18 +23,18 @@ function tbz_wc_simplepay_init() {
 	/**
  	 * Gateway class
  	 */
-	class WC_Tbz_SimplePay_Gateway extends WC_Payment_Gateway {
+	class WC_Jcard_Gateway extends WC_Payment_Gateway {
 
 		public function __construct(){
 
-			$this->id 					= 'tbz_simplepay_gateway';
+			$this->id 					= 'jcard_gateway';
     		$this->icon 				= '';
 			$this->has_fields 			= false;
 			$this->order_button_text    = 'Make Payment';
         	$this->testurl 				= 'http://60.199.176.121/Payment/Choice.asp';
             $this->liveurl 				= 'http://www.gamecard.com.tw/Payment/Choice.asp';
-        	$this->method_title     	= 'Jdway';
-        	$this->method_description  	= 'Pay by Jdway';
+        	$this->method_title     	= 'Jcard';
+        	$this->method_description  	= 'Pay through Jcard';
 
 			$this->init_form_fields();
 			$this->init_settings();
@@ -49,11 +49,11 @@ function tbz_wc_simplepay_init() {
 			$this->sign_key					= $this->get_option( 'sign_key' );
 
 			//Actions
-			add_action( 'woocommerce_receipt_tbz_simplepay_gateway', array($this, 'receipt_page'));
+			add_action( 'woocommerce_receipt_jcard_gateway', array($this, 'receipt_page'));
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 
 			// Payment listener/API hook
-			add_action( 'woocommerce_api_wc_tbz_simplepay_gateway', array( $this, 'check_simplepay_response' ) );
+			add_action( 'woocommerce_api_wc_jcard_gateway', array( $this, 'check_simplepay_response' ) );
 
 			// Check if the gateway can be used
 		}
@@ -344,7 +344,7 @@ function tbz_wc_simplepay_init() {
 			$order 			= new WC_Order( $order_id );
 			$payment_method = $order->payment_method;
 
-			if( is_order_received_page() &&  ( 'tbz_simplepay_gateway' == $payment_method ) ){
+			if( is_order_received_page() &&  ( 'jcard_gateway' == $payment_method ) ){
 				$simplepay_message 	= get_post_meta( $order_id, '_tbz_simplepay_message', true );
 
 				if( isset( $simplepay_message ) && ! empty( $simplepay_message ) ){
@@ -370,7 +370,7 @@ function tbz_wc_simplepay_init() {
  	* Add SimplePay Gateway to WC
  	**/
 	function tbz_wc_add_simplepay_gateway($methods) {
-		$methods[] = 'WC_Tbz_SimplePay_Gateway';
+		$methods[] = 'WC_Jcard_Gateway';
 		return $methods;
 	}
 
@@ -390,7 +390,7 @@ function tbz_wc_simplepay_init() {
 		}
 
 		if ($file == $this_plugin) {
-			$settings_link = '<a href="' . get_bloginfo('wpurl') . '/wp-admin/admin.php?page=wc-settings&tab=checkout&section=wc_tbz_simplepay_gateway">Settings</a>';
+			$settings_link = '<a href="' . get_bloginfo('wpurl') . '/wp-admin/admin.php?page=wc-settings&tab=checkout&section=wc_jcard_gateway">Settings</a>';
 			array_unshift($links, $settings_link);
 		}
 		return $links;
@@ -400,14 +400,14 @@ function tbz_wc_simplepay_init() {
  	* Display the testmode notice
  	**/
 	function wc_testmode_notice(){
-		$tbz_simplepay_settings = get_option( 'woocommerce_tbz_simplepay_gateway_settings' );
+		$tbz_simplepay_settings = get_option( 'woocommerce_jcard_gateway_simplepay_gateway_settings' );
 
 		$simplepay_test_mode = $tbz_simplepay_settings['testmode'];
 
 		if ( 'yes' == $simplepay_test_mode ) {
 	    ?>
 		    <div class="update-nag">
-		        SimplePay testmode is still enabled. Click <a href="<?php echo get_bloginfo('wpurl') ?>/wp-admin/admin.php?page=wc-settings&tab=checkout&section=WC_Tbz_SimplePay_Gateway">here</a> to disable it when you want to start accepting live payment on your site.
+		        SimplePay testmode is still enabled. Click <a href="<?php echo get_bloginfo('wpurl') ?>/wp-admin/admin.php?page=wc-settings&tab=checkout&section=WC_Jcard_Gateway">here</a> to disable it when you want to start accepting live payment on your site.
 		    </div>
 	    <?php
 		}
