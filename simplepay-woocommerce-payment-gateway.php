@@ -31,8 +31,6 @@ function tbz_wc_simplepay_init() {
 			$this->icon 				= '';
 			$this->has_fields 			= false;
 			$this->order_button_text	= 'Make Payment';
-			$this->testurl 				= 'http://60.199.176.121/Payment/Choice.asp';
-			$this->liveurl 				= 'http://www.gamecard.com.tw/Payment/Choice.asp';
 			$this->method_title	 	    = 'Jcard';
 			$this->method_description  	= 'Pay through Jcard';
 
@@ -40,13 +38,15 @@ function tbz_wc_simplepay_init() {
 			$this->init_settings();
 
 			// Define user set variables
-			$this->title 					= $this->get_option( 'title' );
-			$this->description 				= $this->get_option( 'description' );
-			$this->testmode					= $this->get_option( 'testmode' );
+			$this->title 				= $this->get_option( 'title' );
+			$this->description 			= $this->get_option( 'description' );
+			$this->testmode				= $this->get_option( 'testmode' );
 
 			// Jdway information
-			$this->service_code				= $this->get_option( 'service_code' );
-			$this->sign_key					= $this->get_option( 'sign_key' );
+			$this->service_code			= $this->get_option( 'service_code' );
+			$this->sign_key				= $this->get_option( 'sign_key' );
+			$this->testurl 				= $this->get_option('testurl');
+			$this->liveurl 				= $this->get_option('liveurl');
 
 			//Actions
 			add_action( 'woocommerce_receipt_jcard_gateway', array($this, 'receipt_page'));
@@ -94,6 +94,18 @@ function tbz_wc_simplepay_init() {
 					'type' 			=> 'textarea',
 					'description' 	=> 'This controls the description which the user sees during checkout.',
 					'default' 		=> 'Payment Methods Accepted: MasterCard, VisaCard, Verve Card & eTranzact'
+				),
+				'liveurl' => array(
+					'title' 		=> 'LiveUrl',
+					'type' 			=> 'text',
+					'description' 	=> '',
+					'default' 		=> 'http://www.gamecard.com.tw/Payment/Choice.asp'
+				),
+				'testurl' => array(
+					'title' 		=> 'Sand Box',
+					'type' 			=> 'text',
+					'description' 	=> '',
+					'default' 		=> 'http://60.199.176.121/Payment/Choice.asp'
 				),
 				'service_code' => array(
 					'title' 		=> 'ServiceCode',
@@ -164,7 +176,6 @@ function tbz_wc_simplepay_init() {
 			$payment_args = http_build_query( $jdway_args, '', '&' );
 
 			if ($sandbox) {
-				echo $this->testurl . $payment_args;
 				return $this->testurl .'?'. $payment_args;
 			} else {
 				return $this->liveurl .'?'. $payment_args;
