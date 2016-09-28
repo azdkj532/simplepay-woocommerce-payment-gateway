@@ -6,8 +6,8 @@
 	Version: 1.2.0
 	Author: Tunbosun Ayinla
 	Author URI: http://bosun.me/
-	License:           GPL-2.0+
- 	License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
+	License:		   GPL-2.0+
+ 	License URI:	   http://www.gnu.org/licenses/gpl-2.0.txt
  	GitHub Plugin URI: https://github.com/tubiz/simplepay-woocommerce-payment-gateway
 */
 
@@ -28,13 +28,13 @@ function tbz_wc_simplepay_init() {
 		public function __construct(){
 
 			$this->id 					= 'jcard_gateway';
-    		$this->icon 				= '';
+			$this->icon 				= '';
 			$this->has_fields 			= false;
-			$this->order_button_text    = 'Make Payment';
-        	$this->testurl 				= 'http://60.199.176.121/Payment/Choice.asp';
-            $this->liveurl 				= 'http://www.gamecard.com.tw/Payment/Choice.asp';
-        	$this->method_title     	= 'Jcard';
-        	$this->method_description  	= 'Pay through Jcard';
+			$this->order_button_text	= 'Make Payment';
+			$this->testurl 				= 'http://60.199.176.121/Payment/Choice.asp';
+			$this->liveurl 				= 'http://www.gamecard.com.tw/Payment/Choice.asp';
+			$this->method_title	 	= 'Jcard';
+			$this->method_description  	= 'Pay through Jcard';
 
 			$this->init_form_fields();
 			$this->init_settings();
@@ -44,7 +44,7 @@ function tbz_wc_simplepay_init() {
 			$this->description 				= $this->get_option( 'description' );
 			$this->testmode					= $this->get_option( 'testmode' );
 
-            // Jdway information
+			// Jdway information
 			$this->service_code				= $this->get_option( 'service_code' );
 			$this->sign_key					= $this->get_option( 'sign_key' );
 
@@ -58,20 +58,20 @@ function tbz_wc_simplepay_init() {
 			// Check if the gateway can be used
 		}
 
-        /**
-         * Admin Panel Options
-         **/
-        public function admin_options(){
-            echo '<h3>Jdways Payment settings</h3>';
-            echo '<p>To open a SimplePay merchant account click <a href="https://simplepay4u.com" target="_blank">here</a>';
-            echo '<table class="form-table">';
-            $this->generate_settings_html();
-            echo '</table>';
-        }
+		/**
+		 * Admin Panel Options
+		 **/
+		public function admin_options(){
+			echo '<h3>Jdways Payment settings</h3>';
+			echo '<p>To open a SimplePay merchant account click <a href="https://simplepay4u.com" target="_blank">here</a>';
+			echo '<table class="form-table">';
+			$this->generate_settings_html();
+			echo '</table>';
+		}
 
-	    /**
-	     * Initialise Gateway Settings Form Fields
-	    **/
+		/**
+		 * Initialise Gateway Settings Form Fields
+		**/
 		function init_form_fields(){
 			$this->form_fields = array(
 				'enabled' => array(
@@ -79,15 +79,15 @@ function tbz_wc_simplepay_init() {
 					'type' 			=> 'checkbox',
 					'label' 		=> 'Enable SimplePay Payment Gateway',
 					'description' 	=> 'Enable or disable the gateway.',
-            		'desc_tip'      => true,
+					'desc_tip'		=> true,
 					'default' 		=> 'yes'
 				),
 				'title' => array(
 					'title' 		=> 'Title',
 					'type' 			=> 'text',
 					'description' 	=> 'This controls the title which the user sees during checkout.',
-        			'desc_tip'      => false,
-					'default' 		=> 'SimplePay'
+					'desc_tip'		=> false,
+					'default' 		=> 'Jcard'
 				),
 				'description' => array(
 					'title' 		=> 'Description',
@@ -95,16 +95,30 @@ function tbz_wc_simplepay_init() {
 					'description' 	=> 'This controls the description which the user sees during checkout.',
 					'default' 		=> 'Payment Methods Accepted: MasterCard, VisaCard, Verve Card & eTranzact'
 				),
+				'service_code' => array(
+					'title' 		=> 'ServiceCode',
+					'type' 			=> 'text',
+					'description' 	=> 'This controls the ServiceCode which the server uses during payment.',
+					'desc_tip'		=> false,
+					'default' 		=> ''
+				),
+				'sign_key' => array(
+					'title' 		=> 'SignKey',
+					'type' 			=> 'text',
+					'description' 	=> '',
+					'desc_tip		'=> false,
+					'default' 		=> ''
+				),
 				'testing' => array(
-					'title'       	=> 'Gateway Testing',
-					'type'        	=> 'title',
+					'title'	   		=> 'Gateway Testing',
+					'type'			=> 'title',
 					'description' 	=> '',
 				),
 				'testmode' => array(
-					'title'       	=> 'Test Mode',
-					'type'        	=> 'checkbox',
-					'label'       	=> 'Enable Test Mode',
-					'default'     	=> 'no',
+					'title'	   		=> 'Test Mode',
+					'type'			=> 'checkbox',
+					'label'	   		=> 'Enable Test Mode',
+					'default'	 	=> 'no',
 					'description' 	=> 'Test mode enables you to test payments before going live. <br />If you ready to start receving payment on your site, kindly uncheck this.',
 				)
 			);
@@ -118,8 +132,8 @@ function tbz_wc_simplepay_init() {
 			$order_id 		= $order->id;
 			$order_total	= $order->get_total();
 
-            $return_url     = esc_url( $this->get_return_url( $order ) );
-            $cancel_url 	= esc_url( $order->get_cancel_order_url() );
+			$return_url	 	= esc_url( $this->get_return_url( $order ) );
+			$cancel_url 	= esc_url( $order->get_cancel_order_url() );
 
 			$memo			= '';
 			$sign_code		= md5($order_id . $this->sign_key);
@@ -140,37 +154,37 @@ function tbz_wc_simplepay_init() {
 			return $jdway_args;
 		}
 
-        /*
-         * Generate payment request url
-         */
-        function get_redirect_url( $order_id, $sandbox = false ) {
+		/*
+		 * Generate payment request url
+		 */
+		function get_redirect_url( $order_id, $sandbox = false ) {
 			$order 			= wc_get_order( $order_id );
 
 			$jdway_args = $this->get_jdway_args( $order );
 			$payment_args = http_build_query( $jdway_args, '', '&' );
 
-            if ($sandbox) {
-                echo $this->testurl . $payment_args;
-                return $this->testurl .'?'. $payment_args;
-            } else {
-                return $this->liveurl .'?'. $payment_args;
-            }
-        }
-
-	    /**
-	     * Process the payment and return the result
-	    **/
-		function process_payment( $order_id ) {
-            $sandbox = 'yes' === $this->testmode;
-			return array(
-	        	'result' => 'success',
-				'redirect'	=> $this->get_redirect_url( $order_id, $sandbox ),
-	        );
+			if ($sandbox) {
+				echo $this->testurl . $payment_args;
+				return $this->testurl .'?'. $payment_args;
+			} else {
+				return $this->liveurl .'?'. $payment_args;
+			}
 		}
 
-	    /**
-	     * Output for the order received page.
-	    **/
+		/**
+		 * Process the payment and return the result
+		**/
+		function process_payment( $order_id ) {
+			$sandbox = 'yes' === $this->testmode;
+			return array(
+				'result' => 'success',
+				'redirect'	=> $this->get_redirect_url( $order_id, $sandbox ),
+			);
+		}
+
+		/**
+		 * Output for the order received page.
+		**/
 		function receipt_page( $order ) {
 			echo '<p>Thank you - your order is now pending payment. You will be automatically redirected to the gateway to make payment.</p>';
 		}
@@ -188,20 +202,20 @@ function tbz_wc_simplepay_init() {
 				$order_id 		= (int) $order_id;
 
 				$order 			= wc_get_order( $order_id );
-		        $order_total	= $order->get_total();
+				$order_total	= $order->get_total();
 
-				$amount_paid    = $_POST['total'];
+				$amount_paid	= $_POST['total'];
 				$response_code 	= $_POST['SP_TRANSACTION_ERROR_CODE'];
 				$response_desc  = $_POST['SP_TRANSACTION_ERROR'];
 
-                do_action('tbz_wc_simplepay_after_payment', $_POST);
+				do_action('tbz_wc_simplepay_after_payment', $_POST);
 
 				if( 'SP0000' == $response_code ) {
 
 					// check if the amount paid is equal to the order amount.
 					if( $amount_paid < $order_total ) {
 
-		                //Update the order status
+						//Update the order status
 						$order->update_status('on-hold', '');
 
 						//Error Note
@@ -209,10 +223,10 @@ function tbz_wc_simplepay_init() {
 						$message_type = 'notice';
 
 						//Add Customer Order Note
-	                    $order->add_order_note($message.'<br />Simplepay Transaction ID: '.$transaction_id, 1);
+						$order->add_order_note($message.'<br />Simplepay Transaction ID: '.$transaction_id, 1);
 
-	                    //Add Admin Order Note
-	                    $order->add_order_note('Look into this order. <br />This order is currently on hold.<br />Reason: Amount paid is less than the total order amount.<br />Amount Paid was &#8358; '.$amount_paid.' while the total order amount is &#8358; '.$order_total.'<br />Simplepay Transaction ID: '.$transaction_id);
+						//Add Admin Order Note
+						$order->add_order_note('Look into this order. <br />This order is currently on hold.<br />Reason: Amount paid is less than the total order amount.<br />Amount Paid was &#8358; '.$amount_paid.' while the total order amount is &#8358; '.$order_total.'<br />Simplepay Transaction ID: '.$transaction_id);
 
 						// Reduce stock levels
 						$order->reduce_order_stock();
@@ -223,10 +237,10 @@ function tbz_wc_simplepay_init() {
 					else
 					{
 
-		                if( $order->status == 'processing' ){
-		                    $order->add_order_note('Payment Via Simplepay Payment Gateway<br />Transaction ID: '.$transaction_id);
+						if( $order->status == 'processing' ){
+							$order->add_order_note('Payment Via Simplepay Payment Gateway<br />Transaction ID: '.$transaction_id);
 
-		                    //Add customer order note
+							//Add customer order note
 		 					$order->add_order_note('Payment Received.<br />Your order is currently being processed.<br />We will be shipping your order to you soon.<br />Transaction ID: '.$transaction_id, 1);
 
 							// Reduce stock levels
@@ -237,51 +251,51 @@ function tbz_wc_simplepay_init() {
 
 							$message = 'Thank you for shopping with us.<br />Your transaction was successful, payment was received.<br />Your order is currently being processed.';
 							$message_type = 'success';
-		                }
-		                else {
+						}
+						else {
 
-		                	if( $order->has_downloadable_item() ){
+							if( $order->has_downloadable_item() ){
 
-		                		//Update order status
+								//Update order status
 								$order->update_status( 'completed', 'Payment received, your order is now complete.' );
 
-			                    //Add admin order note
-			                    $order->add_order_note('Payment Via Simplepay Payment Gateway<br />Transaction ID: '.$transaction_id);
+								//Add admin order note
+								$order->add_order_note('Payment Via Simplepay Payment Gateway<br />Transaction ID: '.$transaction_id);
 
-			                    //Add customer order note
+								//Add customer order note
 			 					$order->add_order_note('Payment Received.<br />Your order is now complete.<br />Transaction ID: '.$transaction_id, 1);
 
 								$message = 'Thank you for shopping with us.<br />Your transaction was successful, payment was received.<br />Your order is now complete.';
 								$message_type = 'success';
 
-		                	}
-		                	else {
+							}
+							else {
 
-		                		//Update order status
+								//Update order status
 								$order->update_status( 'processing', 'Payment received, your order is currently being processed.' );
 
 								//Add admin order noote
-			                    $order->add_order_note('Payment Via Simplepay Payment Gateway<br />Transaction ID: '.$transaction_id);
+								$order->add_order_note('Payment Via Simplepay Payment Gateway<br />Transaction ID: '.$transaction_id);
 
-			                    //Add customer order note
+								//Add customer order note
 			 					$order->add_order_note('Payment Received.<br />Your order is currently being processed.<br />We will be shipping your order to you soon.<br />Transaction ID: '.$transaction_id, 1);
 
 								$message = 'Thank you for shopping with us.<br />Your transaction was successful, payment was received.<br />Your order is currently being processed.';
 								$message_type = 'success';
-		                	}
+							}
 
 							// Reduce stock levels
 							$order->reduce_order_stock();
 
 							// Empty cart
 							WC()->cart->empty_cart();
-		                }
-	                }
+						}
+					}
 
-	                $simplepay_message = array(
-	                	'message'	=> $message,
-	                	'message_type' => $message_type
-	                );
+					$simplepay_message = array(
+						'message'	=> $message,
+						'message_type' => $message_type
+					);
 
 					if ( version_compare( WOOCOMMERCE_VERSION, "2.2" ) >= 0 ) {
 						add_post_meta( $order_id, '_transaction_id', $transaction_id, true );
@@ -289,48 +303,48 @@ function tbz_wc_simplepay_init() {
 
 					update_post_meta( $order_id, '_tbz_simplepay_message', $simplepay_message );
 
-                    die( 'IPN Processed OK. Payment Successfully' );
+					die( 'IPN Processed OK. Payment Successfully' );
 				}
 
-	            else
-	            {
-	            	$message = 	'Thank you for shopping with us. <br />However, the transaction wasn\'t successful, payment wasn\'t received.';
+				else
+				{
+					$message = 	'Thank you for shopping with us. <br />However, the transaction wasn\'t successful, payment wasn\'t received.';
 					$message_type = 'error';
 
 					//Add Customer Order Note
-                   	$order->add_order_note($message.'<br />Transaction ID: '.$transaction_id, 1);
+				   	$order->add_order_note($message.'<br />Transaction ID: '.$transaction_id, 1);
 
-                    //Add Admin Order Note
-                  	$order->add_order_note($message.'<br />Simplepay Transaction ID: '.$transaction_id);
+					//Add Admin Order Note
+				  	$order->add_order_note($message.'<br />Simplepay Transaction ID: '.$transaction_id);
 
 
-	                //Update the order status
+					//Update the order status
 					$order->update_status('failed', 'Payment failed');
 
-	                $simplepay_message = array(
-	                	'message'	  	=> $message,
-	                	'message_type' 	=> $message_type
-	                );
+					$simplepay_message = array(
+						'message'	  	=> $message,
+						'message_type' 	=> $message_type
+					);
 
 					update_post_meta( $order_id, '_tbz_simplepay_message', $simplepay_message );
 
-                    die( 'IPN Processed OK. Payment Failed' );
-	            }
+					die( 'IPN Processed OK. Payment Failed' );
+				}
 			}
 			else{
 				$order_id 		= $_POST['customid'];
 
-            	$message 		= 'Thank you for shopping with us. <br />However, the transaction wasn\'t successful, payment wasn\'t received.';
+				$message 		= 'Thank you for shopping with us. <br />However, the transaction wasn\'t successful, payment wasn\'t received.';
 				$message_type 	= 'error';
 
-                $simplepay_message = array(
-                	'message'		=> $message,
-                	'message_type' 	=> $message_type
-                );
+				$simplepay_message = array(
+					'message'		=> $message,
+					'message_type' 	=> $message_type
+				);
 
 				update_post_meta( $order_id, '_tbz_simplepay_message', $simplepay_message );
 
-                die( 'IPN Processed OK' );
+				die( 'IPN Processed OK' );
 			}
 		}
 
@@ -405,11 +419,11 @@ function tbz_wc_simplepay_init() {
 		$_test_mode = $settings['testmode'];
 
 		if ( 'yes' == $simplepay_test_mode ) {
-	    ?>
-		    <div class="update-nag">
-		        SimplePay testmode is still enabled. Click <a href="<?php echo get_bloginfo('wpurl') ?>/wp-admin/admin.php?page=wc-settings&tab=checkout&section=WC_Jcard_Gateway">here</a> to disable it when you want to start accepting live payment on your site.
-		    </div>
-	    <?php
+		?>
+			<div class="update-nag">
+				SimplePay testmode is still enabled. Click <a href="<?php echo get_bloginfo('wpurl') ?>/wp-admin/admin.php?page=wc-settings&tab=checkout&section=WC_Jcard_Gateway">here</a> to disable it when you want to start accepting live payment on your site.
+			</div>
+		<?php
 		}
 	}
 	add_action( 'admin_notices', 'wc_testmode_notice' );
