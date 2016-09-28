@@ -63,7 +63,6 @@ function tbz_wc_simplepay_init() {
 		 **/
 		public function admin_options(){
 			echo '<h3>Jdways Payment settings</h3>';
-			echo '<p>To open a SimplePay merchant account click <a href="https://simplepay4u.com" target="_blank">here</a>';
 			echo '<table class="form-table">';
 			$this->generate_settings_html();
 			echo '</table>';
