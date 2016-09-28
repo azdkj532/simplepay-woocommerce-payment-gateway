@@ -33,7 +33,7 @@ function tbz_wc_simplepay_init() {
 			$this->order_button_text	= 'Make Payment';
 			$this->testurl 				= 'http://60.199.176.121/Payment/Choice.asp';
 			$this->liveurl 				= 'http://www.gamecard.com.tw/Payment/Choice.asp';
-			$this->method_title	 	= 'Jcard';
+			$this->method_title	 	    = 'Jcard';
 			$this->method_description  	= 'Pay through Jcard';
 
 			$this->init_form_fields();
@@ -416,9 +416,9 @@ function tbz_wc_simplepay_init() {
 	function wc_testmode_notice(){
 		$settings = get_option( 'woocommerce_jcard_gateway_settings' );
 
-		$_test_mode = $settings['testmode'];
+		$test_mode = $settings['testmode'];
 
-		if ( 'yes' == $simplepay_test_mode ) {
+		if ( 'yes' == $test_mode ) {
 		?>
 			<div class="update-nag">
 				SimplePay testmode is still enabled. Click <a href="<?php echo get_bloginfo('wpurl') ?>/wp-admin/admin.php?page=wc-settings&tab=checkout&section=WC_Jcard_Gateway">here</a> to disable it when you want to start accepting live payment on your site.
