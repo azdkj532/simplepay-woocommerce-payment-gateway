@@ -201,7 +201,7 @@ function tbz_wc_simplepay_init() {
 		**/
 		function receipt_page( $order_id ) {
             $order = wc_get_order( $order_id );
-			echo '<p>Thank you - your order is now pending payment. You will be automatically redirected to the gateway to make payment.</p>';
+			echo '<p>Thank you - your order is now pending payment. You will be automatically redirected to the gateway to make payment.';
 
             if ( 'yes' == $this->testmode ) {
                 $payment_url = $this->testurl;
@@ -213,7 +213,7 @@ function tbz_wc_simplepay_init() {
             $jdway_form_array = array();
 
             foreach ($jdway_args as $key => $value) {
-                $simplepay_form_array[] = '<input type="hidden" name="'.esc_attr( $key ).'" value="'.esc_attr( $value ).'" />';
+                $jdway_form_array[] = '<input type="hidden" name="'.esc_attr( $key ).'" value="'.esc_attr( $value ).'" />';
             }
 
             return '<form action="' . esc_url( $payment_url ) . '" method="post" id="jdway_payment_form" target="_top">
