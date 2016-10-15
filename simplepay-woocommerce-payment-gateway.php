@@ -192,7 +192,7 @@ function tbz_wc_simplepay_init() {
 			$sandbox = 'yes' === $this->testmode;
 			return array(
 				'result' => 'success',
-				'redirect'	=> $order->get_checkout_payment_url( true );
+				'redirect'	=> $order->get_checkout_payment_url( true ),
 			);
 		}
 
