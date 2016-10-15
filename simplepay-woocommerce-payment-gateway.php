@@ -49,7 +49,7 @@ function tbz_wc_simplepay_init() {
 			$this->liveurl 				= $this->get_option('liveurl');
 
 			//Actions
-			add_action( 'woocommerce_receipt_jcard_gateway', array($this, 'receipt_page'));
+			add_action( 'woocommerce_receipt_' . $this->id, array($this, 'receipt_page'));
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 
 			// Payment listener/API hook
@@ -188,18 +188,24 @@ function tbz_wc_simplepay_init() {
 		 * Process the payment and return the result
 		**/
 		function process_payment( $order_id ) {
+            $order = wc_get_order( $order_id );
 			$sandbox = 'yes' === $this->testmode;
 			return array(
 				'result' => 'success',
-				'redirect'	=> $this->get_redirect_url( $order_id, $sandbox ),
+				'redirect'	=> $order->get_checkout_payment_url( true );
 			);
 		}
 
 		/**
 		 * Output for the order received page.
 		**/
-		function receipt_page( $order ) {
+		function receipt_page( $order_id ) {
+            $order = wc_get_order( $order_id );
+            $products = $order->get_items();
 			echo '<p>Thank you - your order is now pending payment. You will be automatically redirected to the gateway to make payment.</p>';
+            foreach ($products as $key => $value) {
+                echo 'Key: ' . $key . ' value ' . $value;
+            }
 		}
 
 		/**
