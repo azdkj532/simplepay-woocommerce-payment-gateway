@@ -161,6 +161,7 @@ function tbz_wc_simplepay_init() {
 				'SignCode'		=> $sign_code,
 				'PayType'		=> 'F',
                 'Money'			=> $order_total,
+				'PayTypeFor'	=> 'summit',
 			);
 
 			$jdway_args = apply_filters( 'woocommerce_simplepay_args', $payment_args );
