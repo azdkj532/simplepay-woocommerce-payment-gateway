@@ -142,6 +142,7 @@ function tbz_wc_simplepay_init() {
 
 			$order_id 		= $order->id;
 			$order_total	= $order->get_total();
+			$user_id		= $order->get_user_id();
 
 			$return_url	 	= esc_url( $this->get_return_url( $order ) );
 			$cancel_url 	= esc_url( $order->get_cancel_order_url() );
@@ -154,11 +155,12 @@ function tbz_wc_simplepay_init() {
 				'ServiceCode' 	=> $this->service_code,
 				'OrderID'		=> $order_id,
 				'ReturnURL'		=> esc_url_raw($return_url),
-				'UserID'		=> 'userid',
+				'UserID'		=> $user_id,
 				'Memo'			=> $memo,
 				'Product'		=> '',
 				'SignCode'		=> $sign_code,
-				'DPage'			=> 'F',
+				'PayType'		=> 'F',
+                'Money'			=> $order_total,
 			);
 
 			$jdway_args = apply_filters( 'woocommerce_simplepay_args', $payment_args );
