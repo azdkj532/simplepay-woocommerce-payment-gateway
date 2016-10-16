@@ -47,13 +47,14 @@ function tbz_wc_simplepay_init() {
 			$this->sign_key				= $this->get_option( 'sign_key' );
 			$this->testurl 				= $this->get_option('testurl');
 			$this->liveurl 				= $this->get_option('liveurl');
+			$this->checkout_url         = WC()->api_request_url('WC_Jcard_Gateway');
 
 			//Actions
 			add_action( 'woocommerce_receipt_' . $this->id, array($this, 'receipt_page'));
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 
 			// Payment listener/API hook
-			add_action( 'woocommerce_api_wc_jcard_gateway', array( $this, 'check_simplepay_response' ) );
+			add_action( 'woocommerce_api_wc_' . $this->id, array( $this, 'check_jdway_response' ) );
 
 			// Check if the gateway can be used
 		}
@@ -144,7 +145,8 @@ function tbz_wc_simplepay_init() {
 			$order_total	= $order->get_total();
 			$user_id		= $order->get_user_id();
 
-			$return_url	 	= esc_url( $this->get_return_url( $order ) );
+			// $return_url	 	= esc_url( $this->get_return_url( $order ) );
+			$return_url	 	= esc_url( $this->checkout_url );
 			$cancel_url 	= esc_url( $order->get_cancel_order_url() );
 
 			$memo			= '';
@@ -230,203 +232,22 @@ function tbz_wc_simplepay_init() {
 		/**
 		 * Verify a successful Payment!
 		**/
-		function check_simplepay_response( $posted ) {
-
-			if( isset( $_POST['transaction_id'] ) ) {
-
-				$transaction_id = $_POST['transaction_id'];
-
-				$order_id 		= $_POST['customid'];
-				$order_id 		= (int) $order_id;
-
-				$order 			= wc_get_order( $order_id );
-				$order_total	= $order->get_total();
-
-				$amount_paid	= $_POST['total'];
-				$response_code 	= $_POST['SP_TRANSACTION_ERROR_CODE'];
-				$response_desc  = $_POST['SP_TRANSACTION_ERROR'];
-
-				do_action('tbz_wc_simplepay_after_payment', $_POST);
-
-				if( 'SP0000' == $response_code ) {
-
-					// check if the amount paid is equal to the order amount.
-					if( $amount_paid < $order_total ) {
-
-						//Update the order status
-						$order->update_status('on-hold', '');
-
-						//Error Note
-						$message = 'Thank you for shopping with us.<br />Your payment transaction was successful, but the amount paid is not the same as the total order amount.<br />Your order is currently on-hold.<br />Kindly contact us for more information regarding your order and payment status.';
-						$message_type = 'notice';
-
-						//Add Customer Order Note
-						$order->add_order_note($message.'<br />Simplepay Transaction ID: '.$transaction_id, 1);
-
-						//Add Admin Order Note
-						$order->add_order_note('Look into this order. <br />This order is currently on hold.<br />Reason: Amount paid is less than the total order amount.<br />Amount Paid was &#8358; '.$amount_paid.' while the total order amount is &#8358; '.$order_total.'<br />Simplepay Transaction ID: '.$transaction_id);
-
-						// Reduce stock levels
-						$order->reduce_order_stock();
-
-						// Empty cart
-						WC()->cart->empty_cart();
-					}
-					else
-					{
-
-						if( $order->status == 'processing' ){
-							$order->add_order_note('Payment Via Simplepay Payment Gateway<br />Transaction ID: '.$transaction_id);
-
-							//Add customer order note
-		 					$order->add_order_note('Payment Received.<br />Your order is currently being processed.<br />We will be shipping your order to you soon.<br />Transaction ID: '.$transaction_id, 1);
-
-							// Reduce stock levels
-							$order->reduce_order_stock();
-
-							// Empty cart
-							WC()->cart->empty_cart();
-
-							$message = 'Thank you for shopping with us.<br />Your transaction was successful, payment was received.<br />Your order is currently being processed.';
-							$message_type = 'success';
-						}
-						else {
-
-							if( $order->has_downloadable_item() ){
-
-								//Update order status
-								$order->update_status( 'completed', 'Payment received, your order is now complete.' );
-
-								//Add admin order note
-								$order->add_order_note('Payment Via Simplepay Payment Gateway<br />Transaction ID: '.$transaction_id);
-
-								//Add customer order note
-			 					$order->add_order_note('Payment Received.<br />Your order is now complete.<br />Transaction ID: '.$transaction_id, 1);
-
-								$message = 'Thank you for shopping with us.<br />Your transaction was successful, payment was received.<br />Your order is now complete.';
-								$message_type = 'success';
-
-							}
-							else {
-
-								//Update order status
-								$order->update_status( 'processing', 'Payment received, your order is currently being processed.' );
-
-								//Add admin order noote
-								$order->add_order_note('Payment Via Simplepay Payment Gateway<br />Transaction ID: '.$transaction_id);
-
-								//Add customer order note
-			 					$order->add_order_note('Payment Received.<br />Your order is currently being processed.<br />We will be shipping your order to you soon.<br />Transaction ID: '.$transaction_id, 1);
-
-								$message = 'Thank you for shopping with us.<br />Your transaction was successful, payment was received.<br />Your order is currently being processed.';
-								$message_type = 'success';
-							}
-
-							// Reduce stock levels
-							$order->reduce_order_stock();
-
-							// Empty cart
-							WC()->cart->empty_cart();
-						}
-					}
-
-					$simplepay_message = array(
-						'message'	=> $message,
-						'message_type' => $message_type
-					);
-
-					if ( version_compare( WOOCOMMERCE_VERSION, "2.2" ) >= 0 ) {
-						add_post_meta( $order_id, '_transaction_id', $transaction_id, true );
-					}
-
-					update_post_meta( $order_id, '_tbz_simplepay_message', $simplepay_message );
-
-					die( 'IPN Processed OK. Payment Successfully' );
-				}
-
-				else
-				{
-					$message = 	'Thank you for shopping with us. <br />However, the transaction wasn\'t successful, payment wasn\'t received.';
-					$message_type = 'error';
-
-					//Add Customer Order Note
-				   	$order->add_order_note($message.'<br />Transaction ID: '.$transaction_id, 1);
-
-					//Add Admin Order Note
-				  	$order->add_order_note($message.'<br />Simplepay Transaction ID: '.$transaction_id);
-
-
-					//Update the order status
-					$order->update_status('failed', 'Payment failed');
-
-					$simplepay_message = array(
-						'message'	  	=> $message,
-						'message_type' 	=> $message_type
-					);
-
-					update_post_meta( $order_id, '_tbz_simplepay_message', $simplepay_message );
-
-					die( 'IPN Processed OK. Payment Failed' );
-				}
-			}
-			else{
-				$order_id 		= $_POST['customid'];
-
-				$message 		= 'Thank you for shopping with us. <br />However, the transaction wasn\'t successful, payment wasn\'t received.';
-				$message_type 	= 'error';
-
-				$simplepay_message = array(
-					'message'		=> $message,
-					'message_type' 	=> $message_type
-				);
-
-				update_post_meta( $order_id, '_tbz_simplepay_message', $simplepay_message );
-
-				die( 'IPN Processed OK' );
-			}
+		function check_jdway_response( $posted ) {
+            error_log(implode('', $_POST));
+            error_log(gettype($posted));
 		}
 
 	}
-
-	function tbz_wc_simplepay_success_message(){
-
-		if( function_exists( 'is_order_received_page' )){
-
-			$order_id 		= absint( get_query_var( 'order-received' ) );
-			$order 			= new WC_Order( $order_id );
-			$payment_method = $order->payment_method;
-
-			if( is_order_received_page() &&  ( 'jcard_gateway' == $payment_method ) ){
-				$simplepay_message 	= get_post_meta( $order_id, '_tbz_simplepay_message', true );
-
-				if( isset( $simplepay_message ) && ! empty( $simplepay_message ) ){
-					if( ! empty( $simplepay_message['message'] ) ){
-						$message 		= $simplepay_message['message'];
-					}
-					if( ! empty( $simplepay_message['message_type'] ) ){
-						$message_type 	= $simplepay_message['message_type'];
-					}
-
-					delete_post_meta( $order_id, '_tbz_simplepay_message' );
-
-					if( ! wc_has_notice ($message, $message_type ) ){
-						wc_add_notice( $message, $message_type );
-					}
-				}
-			}
-		}
-	}
-	add_action( 'wp', 'tbz_wc_simplepay_success_message' );
 
 	/**
  	* Add SimplePay Gateway to WC
  	**/
-	function tbz_wc_add_simplepay_gateway($methods) {
+	function wc_add_jdways_gateway($methods) {
 		$methods[] = 'WC_Jcard_Gateway';
 		return $methods;
 	}
 
-	add_filter('woocommerce_payment_gateways', 'tbz_wc_add_simplepay_gateway' );
+	add_filter('woocommerce_payment_gateways', 'wc_add_jdways_gateway' );
 
 
 	/**
