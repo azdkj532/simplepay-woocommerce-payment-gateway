@@ -233,8 +233,30 @@ function tbz_wc_simplepay_init() {
 		 * Verify a successful Payment!
 		**/
 		function check_jdway_response( $posted ) {
-            error_log(implode('', $_POST));
-            error_log(gettype($posted));
+			if ($_POST['Flag'] == '1') {
+				$order_id = $_POST['OrderID'];
+				$order = wc_get_order( $order_id );
+
+				$transaction_id = $_POST['TransactionID'];
+				$service_code = $this->service_code;
+				$money = $order->get_total();
+
+				// check sign code
+
+				$sign_code = md5('' . $order_id .'&'. $this->sign_key . '_' . $transaction_id . '&' . $service_code . '_' .$money);
+				if ($sign_code != $_POST['SignCode']) {
+					die ('signed code error');
+				}
+
+				// check money is correct
+				if ($_POST['Money'] != $money) {
+					die ('Wrong amount of payment (' .$_POST['Money']. ' != ' .$money. ')' )
+				}
+				wc_redirect( $this->get_return_url($order) );
+
+			} else {
+				die('Fail to pay the bill');
+			}
 		}
 
 	}
