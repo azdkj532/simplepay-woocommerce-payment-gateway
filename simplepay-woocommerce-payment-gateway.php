@@ -244,7 +244,8 @@ function tbz_wc_simplepay_init() {
 				// check sign code
 
 				$sign_code = md5('' . $order_id .'&'. $this->sign_key . '_' . $transaction_id . '&' . $service_code . '_' .$money);
-				if ($sign_code != $_POST['SignCode']) {
+				$return_sign_code = strtolower($_POST['SignCode']);
+				if ($sign_code != $return_sign_code) {
 					die ('signed code error');
 				}
 
