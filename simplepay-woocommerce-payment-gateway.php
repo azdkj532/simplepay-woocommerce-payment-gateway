@@ -250,7 +250,7 @@ function tbz_wc_simplepay_init() {
 
 				// check money is correct
 				if ($_POST['Money'] != $money) {
-					die ('Wrong amount of payment (' .$_POST['Money']. ' != ' .$money. ')' )
+					die ('Wrong amount of payment (' .$_POST['Money']. ' != ' .$money. ')' );
 				}
 				wc_redirect( $this->get_return_url($order) );
 
