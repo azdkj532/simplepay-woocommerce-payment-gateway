@@ -253,7 +253,10 @@ function tbz_wc_simplepay_init() {
 				if ($_POST['Money'] != $money) {
 					die ('Wrong amount of payment (' .$_POST['Money']. ' != ' .$money. ')' );
 				}
-				wc_redirect( $this->get_return_url($order) );
+				echo 'Payment Complete';
+				$order->reduce_order_stock();
+				$order->payment_complete();
+				wp_redirect( $this->get_return_url($order) );
 
 			} else {
 				die('Fail to pay the bill');
